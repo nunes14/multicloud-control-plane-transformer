@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/microsoft/multicloud-control-plane-transformer/blob/main/schemas/controlplane.json",
+  "title": "Control Plane Configuration",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/ApplicationAssignment"
+    },
+    {
+      "$ref": "#/$defs/ApplicationDeployment"
+    },
+    {
+      "$ref": "#/$defs/Cluster"
+    },
+    {
+      "$ref": "#/$defs/CpplicationTemplate"
+    }
+  ],
+  "$defs": {
+    "ApplicationAssignment": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "ApplicationAssignment"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the assignment"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "spec": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "application": {
+              "type": "string",
+              "description": "The name of the ApplicationDeployment"
+            },
+            "cluster": {
+              "type": "string",
+              "description": "The name of the Cluster"
+            }
+          },
+          "required": [
+            "application",
+            "cluster"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "metadata",
+        "spec"
+      ]
+    },
+    "ApplicationDeployment": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "ApplicationDeployment"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the application deployment"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "spec": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "repo": {
+              "type": "string",
+              "description": "The url to a Git repository where the Application (app.yaml) is located"
+            },
+            "ref": {
+              "type": "string",
+              "description": "The Git ref (branch/tag/commit) to use"
+            },
+            "path": {
+              "type": "string",
+              "description": "The path within the repo to the Application (app.yaml) file"
+            },
+            "clusters": {
+              "description": "The number of clusters to deploy to, or 'all' for all clusters that match the selector",
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "const": "all"
+                }
+              ]
+            },
+            "selector": {
+              "description": "Create assignments on clusters with label keys and values matching this selector. If empty or not present, the deployment is assumed to target any registered Cluster",
+              "additionalProperties": {
+                "type": [
+                  "string"
+                ]
+              }
+            }
+          },
+          "required": [
+            "repo",
+            "ref",
+            "path",
+            "clusters"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "metadata",
+        "spec"
+      ]
+    },
+    "ApplicationTemplate": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "ApplicationTemplate"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the template, which will be used by Applications"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "spec": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "repo": {
+              "type": "string",
+              "description": "The url to a Git repository where the Template definition is located"
+            },
+            "ref": {
+              "type": "string",
+              "description": "The Git ref (branch/tag/commit) to use"
+            },
+            "path": {
+              "type": "string",
+              "description": "The path within the repo to the Template definition file"
+            }
+          },
+          "required": [
+            "repo",
+            "ref",
+            "path"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "metadata",
+        "spec"
+      ]
+    },
+    "Cluster": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "Cluster"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the cluster"
+            },
+            "labels": {
+              "type": "object",
+              "description": "Map of string keys and values that can be used to organize and categorize (scope and select) objects",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "spec": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "environments": {
+              "type": "array",
+              "description": "One or more environments to which the cluster belongs",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "metadata",
+        "spec"
+      ]
+    }
+  }
+}

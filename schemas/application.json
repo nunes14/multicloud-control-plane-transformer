@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/microsoft/multicloud-control-plane-transformer/blob/main/schemas/application.json",
+  "title": "Application",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "template": {
+      "type": "string",
+      "description": "The name of the template the app is using"
+    },
+    "values": {
+      "type": "object",
+      "description": "A property bag that fills in the values for the chosen template",
+      "additionalProperties": {
+        "type": ["string", "number"]
+      }
+    }
+  },
+  "required": [
+    "template",
+    "values"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/microsoft/multicloud-control-plane-transformer/blob/main/schemas/template.json",
+  "title": "Template",
+  "type": "object",
+  "properties": {
+    "manifests": {
+      "type": "string",
+      "description": "Relative path to a folder that contains k8s manifests"
+    },
+    "parameters": {
+      "type": "object",
+      "description": "A property bag that defines what properties are available to set on this template",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "default": {
+            "type": ["string", "number"]
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "manifests",
+    "parameters"
+  ]
+}
