@@ -1,0 +1,7 @@
+template: external-service
+values:
+  image: nginx
+  cpu: 1
+  memory: 256M
+  replicas: 2
+  port: 80
