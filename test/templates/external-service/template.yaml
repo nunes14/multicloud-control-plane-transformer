@@ -1,0 +1,10 @@
+name: external-service
+manifests: ./deploy
+parameters: 
+  image: {}
+  port: {}
+  cpu:
+    default: 1
+  memory:
+    default: 1G
+  replicas: {} 

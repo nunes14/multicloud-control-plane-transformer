@@ -1,0 +1,7 @@
+kind: ApplicationTemplate
+metadata:
+  name: external-service
+spec:
+  repo: https://github.com/microsoft/multicloud-control-plane-transformer
+  ref: main
+  path: test/templates/external-service/template.yaml
