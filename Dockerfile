@@ -12,7 +12,14 @@ RUN npm run compile
 # use a slim base for the runtime image
 FROM node:14-slim as app
 WORKDIR /app
+
+RUN <<EOF
+apt-get update
+apt-get install -y git
+EOF
+
 COPY package* ./
 RUN --mount=type=cache,target=/root/.npm npm install --production --ignore-scripts
 COPY --from=build /app/build /app/build
+
 ENTRYPOINT ["node", "/app/build/src/cli.js"]

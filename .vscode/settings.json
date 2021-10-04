@@ -2,5 +2,16 @@
   "editor.tabSize": 2,
   "[typescript]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "yaml.schemas": {
+    "schemas/application.json": [
+      "test/applications/*.yaml"
+    ],
+    "schemas/controlplane.json": [
+      "test/control-plane/**/*.yaml"
+    ],
+    "schemas/template.json": [
+      "test/templates/*/*.yaml"
+    ]
   }
 }

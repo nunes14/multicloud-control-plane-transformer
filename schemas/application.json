@@ -13,7 +13,14 @@
       "type": "object",
       "description": "A property bag that fills in the values for the chosen template",
       "additionalProperties": {
-        "type": ["string", "number"]
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          }
+        ]
       }
     }
   },

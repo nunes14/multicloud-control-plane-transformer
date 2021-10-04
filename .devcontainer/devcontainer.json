@@ -42,7 +42,8 @@
 	"extensions": [
 		"GitHub.vscode-pull-request-github",
 		"esbenp.prettier-vscode",
-		"hbenl.vscode-mocha-test-adapter"
+		"hbenl.vscode-mocha-test-adapter",
+		"redhat.vscode-yaml"
 	],
 
 	"remoteEnv": {

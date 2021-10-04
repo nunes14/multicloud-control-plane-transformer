@@ -13,11 +13,12 @@
       "$ref": "#/$defs/Cluster"
     },
     {
-      "$ref": "#/$defs/CpplicationTemplate"
+      "$ref": "#/$defs/ApplicationTemplate"
     }
   ],
   "$defs": {
     "ApplicationAssignment": {
+      "type": "object",
       "additionalProperties": false,
       "properties": {
         "kind": {
@@ -62,6 +63,7 @@
       ]
     },
     "ApplicationDeployment": {
+      "type": "object",
       "additionalProperties": false,
       "properties": {
         "kind": {
@@ -108,6 +110,7 @@
               ]
             },
             "selector": {
+              "type": "object",
               "description": "Create assignments on clusters with label keys and values matching this selector. If empty or not present, the deployment is assumed to target any registered Cluster",
               "additionalProperties": {
                 "type": [
@@ -131,6 +134,7 @@
       ]
     },
     "ApplicationTemplate": {
+      "type": "object",
       "additionalProperties": false,
       "properties": {
         "kind": {
@@ -180,6 +184,7 @@
       ]
     },
     "Cluster": {
+      "type": "object",
       "additionalProperties": false,
       "properties": {
         "kind": {

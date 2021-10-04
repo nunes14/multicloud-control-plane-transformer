@@ -1,0 +1,6 @@
+kind: ApplicationAssignment
+metadata:
+  name: assignment1
+spec:
+  application: testapp1
+  cluster: cluster1

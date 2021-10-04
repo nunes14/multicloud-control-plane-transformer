@@ -16,7 +16,14 @@
         "additionalProperties": false,
         "properties": {
           "default": {
-            "type": ["string", "number"]
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
           }
         }
       }
