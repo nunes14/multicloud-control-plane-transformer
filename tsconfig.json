@@ -3,7 +3,8 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "lib": ["ES2021"]
   },
   "include": [
     "src/**/*.ts",
