@@ -2,7 +2,7 @@ kind: Cluster
 metadata:
   name: cluster1
   labels:
-    region: US
+    geo: US
 spec:
   environments:
     - dev

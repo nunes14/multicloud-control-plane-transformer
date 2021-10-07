@@ -1,0 +1,6 @@
+#!/usr/bin/env node
+
+const cli = require('../build/src/cli.js');
+(async function main() {
+  await cli.program.parseAsync();
+})();

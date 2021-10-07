@@ -1,5 +1,6 @@
 {
   "editor.tabSize": 2,
+  "files.insertFinalNewline": true,
   "[typescript]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -13,5 +14,5 @@
     "schemas/template.json": [
       "test/templates/*/*.yaml"
     ]
-  }
+  },
 }
