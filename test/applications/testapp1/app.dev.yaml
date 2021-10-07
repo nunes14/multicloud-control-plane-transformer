@@ -1,7 +1,7 @@
 template: external-service
 values:
+  app: testapp1
   image: nginx
-  cpu: 1
   memory: 256M
   replicas: 2
   port: 80

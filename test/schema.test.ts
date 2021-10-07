@@ -17,7 +17,7 @@ import templateSchema = require('../schemas/template.json');
 
 describe('schemas', () => {
   it('has well-formed application test data', async () => {
-    await loadAll<Application>('test/applications', applicationSchema);
+    await loadAll<Application>('test/applications/testapp1', applicationSchema);
   });
 
   it('has well-formed control plane test data', async () => {

@@ -28,6 +28,15 @@ export class ControlPlaneClient {
     );
   }
 
+  async getApplicationPath(name: string): Promise<string> {
+    return path.join(this.localPath, 'applications', `${name}.yaml`);
+  }
+
+  async addApplication(application: ApplicationDeployment): Promise<void> {
+    const filePath = await this.getApplicationPath(application.metadata.name);
+    await fs.writeFile(filePath, yaml.dump(application));
+  }
+
   async getAssignments(): Promise<ApplicationAssignment[]> {
     const dir = path.join(this.localPath, 'assignments');
     return await loadAll<ApplicationAssignment>(
@@ -70,5 +79,14 @@ export class ControlPlaneClient {
       dir,
       schema.$defs.ApplicationTemplate
     );
+  }
+
+  async getTemplatePath(name: string): Promise<string> {
+    return path.join(this.localPath, 'templates', `${name}.yaml`);
+  }
+
+  async addTemplate(template: ApplicationTemplate): Promise<void> {
+    const filePath = await this.getTemplatePath(template.metadata.name);
+    await fs.writeFile(filePath, yaml.dump(template));
   }
 }

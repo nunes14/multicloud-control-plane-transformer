@@ -1,5 +1,5 @@
-# syntax=docker/dockerfile:1.3-labs
-FROM node:14 as build
+# build with dev dependencies
+FROM node:16-bullseye as build
 
 RUN npm install -g npm
 
@@ -10,20 +10,20 @@ RUN --mount=type=cache,target=/root/.npm npm install --ignore-scripts
 
 # compile and build an npm package
 COPY . .
-RUN <<EOF
-mkdir /artifacts
-npm pack . --pack-destination /artifacts
-EOF
+RUN mkdir /artifacts \
+  && npm pack . --pack-destination /artifacts
 
 # use a slim base for the runtime image
-FROM node:14-slim as app
+# sparse-checkout needs git version 2.25.0+, which is available starting in bullseye
+FROM node:16-bullseye-slim as app
 WORKDIR /app
 
-RUN <<EOF
-apt-get update
-apt-get install -y git
-EOF
+# sparse-checkout needs git version 2.25.0+
+RUN apt-get update \
+  && apt-get install -y git \
+  && rm -rf /var/lib/apt/lists/*
 
+# install the app
 COPY --from=build /artifacts/*.tgz /artifacts/
 RUN npm install -g /artifacts/*.tgz
 

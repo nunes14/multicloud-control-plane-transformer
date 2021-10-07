@@ -7,8 +7,8 @@ import simpleGit from 'simple-git';
 export async function cloneWithSparseCheckout(
   repo: string,
   patterns: string[],
-  cloneDir?: string,
-  ref = 'main'
+  ref: string,
+  cloneDir?: string
 ): Promise<string> {
   cloneDir = cloneDir || (await fs.mkdtemp(path.join(os.tmpdir(), '/')));
 
@@ -20,7 +20,12 @@ export async function cloneWithSparseCheckout(
   if (patterns.length > 1) {
     await addPatternsToSparseCheckout(patterns.slice(1), cloneDir);
   }
-  await git.addRemote('origin', repo);
+
+  const remotes = await git.getRemotes();
+  if (remotes.filter(r => r.name === 'origin').length === 0) {
+    await git.addRemote('origin', repo);
+  }
+
   await checkout(cloneDir, ref);
 
   return cloneDir;
@@ -35,7 +40,7 @@ export async function addPatternsToSparseCheckout(
   await Promise.all(additions);
 }
 
-export async function checkout(cloneDir: string, ref = 'main') {
+export async function checkout(cloneDir: string, ref: string) {
   const git = simpleGit(cloneDir);
   await git
     .raw('fetch', 'origin', ref, '--depth', '1')

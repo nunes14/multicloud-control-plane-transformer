@@ -70,9 +70,13 @@ describe('ControlPlaneClient', () => {
     await fse.copy('./test/control-plane', tmpDir);
     const client = new ControlPlaneClient(tmpDir);
 
-    await client.deleteAssignment('assignment1');
+    await client.deleteAssignment('testapp1.dev-cluster1');
 
-    const expectedPath = path.join(tmpDir, 'assignments', 'assignment1.yaml');
+    const expectedPath = path.join(
+      tmpDir,
+      'assignments',
+      'testapp1.dev-cluster1.yaml'
+    );
     expect(async () => {
       await fs.stat(expectedPath);
     }).to.throw;

@@ -15,7 +15,8 @@ describe('git', function () {
   it('performs a clone with sparse checkout with one file', async () => {
     const cloneDir = await cloneWithSparseCheckout(
       'https://github.com/microsoft/multicloud-control-plane-transformer',
-      ['LICENSE']
+      ['LICENSE'],
+      'main'
     );
 
     const licensePath = path.join(cloneDir, 'LICENSE');
@@ -23,10 +24,26 @@ describe('git', function () {
     expect(licenseExists).to.equal(true);
   });
 
+  it('clones multiple times to the same directory', async () => {
+    const cloneDir = await cloneWithSparseCheckout(
+      'https://github.com/microsoft/multicloud-control-plane-transformer',
+      ['LICENSE'],
+      'main'
+    );
+
+    await cloneWithSparseCheckout(
+      'https://github.com/microsoft/multicloud-control-plane-transformer',
+      ['LICENSE'],
+      'main',
+      cloneDir
+    );
+  });
+
   it('performs a clone with sparse checkout with multiple files', async () => {
     const cloneDir = await cloneWithSparseCheckout(
       'https://github.com/microsoft/multicloud-control-plane-transformer',
-      ['LICENSE', 'README.md']
+      ['LICENSE', 'README.md'],
+      'main'
     );
 
     const licensePath = path.join(cloneDir, 'LICENSE');
@@ -41,11 +58,12 @@ describe('git', function () {
   it('adds files to an existing sparse checkout', async () => {
     const cloneDir = await cloneWithSparseCheckout(
       'https://github.com/microsoft/multicloud-control-plane-transformer',
-      ['LICENSE']
+      ['LICENSE'],
+      'main'
     );
 
     await addPatternsToSparseCheckout(['README.md'], cloneDir);
-    await checkout(cloneDir);
+    await checkout(cloneDir, 'main');
 
     const readmePath = path.join(cloneDir, 'README.md');
     const readmeExists = fs.existsSync(readmePath);
@@ -55,7 +73,8 @@ describe('git', function () {
   it('does not download additional files', async () => {
     const cloneDir = await cloneWithSparseCheckout(
       'https://github.com/microsoft/multicloud-control-plane-transformer',
-      ['LICENSE']
+      ['LICENSE'],
+      'main'
     );
 
     const files = fs.readdirSync(cloneDir).filter(f => f !== '.git');
@@ -65,7 +84,8 @@ describe('git', function () {
   it('does not download a full commit history', async () => {
     const cloneDir = await cloneWithSparseCheckout(
       'https://github.com/microsoft/multicloud-control-plane-transformer',
-      ['LICENSE']
+      ['LICENSE'],
+      'main'
     );
 
     const git = simpleGit(cloneDir);

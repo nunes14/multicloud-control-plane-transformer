@@ -80,6 +80,17 @@ export interface ApplicationDeployment {
     selector?: {
       [k: string]: string;
     };
+    /**
+     * Template values to be set during deployment. Overrides template defaults and app values
+     */
+    values?: {
+      /**
+       * Template values to be set during deployment. Overrides template defaults and app values
+       */
+      overrides?: {
+        [k: string]: string | number;
+      };
+    };
   };
 }
 export interface Cluster {

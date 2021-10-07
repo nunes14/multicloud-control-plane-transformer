@@ -1,6 +1,6 @@
 kind: ApplicationAssignment
 metadata:
-  name: assignment1
+  name: testapp1.dev-cluster1
 spec:
-  application: testapp1
+  application: testapp1.dev
   cluster: cluster1

@@ -2,6 +2,14 @@
 
 ## Features
 
+### Rendering
+
+The `render` command populates the placeholders in a template with values in the following order:
+
+- Template parameter default values (lowest priority)
+- Application values
+- Application deployment overrides (highest priority)
+
 ### Assignment
 
 The `assign` command reads the contents of a Control Plane Repo and ensures that applications are assigned to the correct clusters.

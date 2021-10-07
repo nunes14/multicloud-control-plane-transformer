@@ -14,7 +14,7 @@ describe('loader', () => {
       'test/control-plane/assignments'
     );
     expect(assignments.length).to.be.greaterThan(0);
-    expect(assignments[0].metadata.name).to.equal('assignment1');
+    expect(assignments[0].metadata.name).to.equal('testapp1.dev-cluster1');
   });
 
   it('loads definitions with schema', async () => {
@@ -23,7 +23,7 @@ describe('loader', () => {
       schema.$defs.ApplicationAssignment
     );
     expect(assignments.length).to.be.greaterThan(0);
-    expect(assignments[0].metadata.name).to.equal('assignment1');
+    expect(assignments[0].metadata.name).to.equal('testapp1.dev-cluster1');
   });
 
   it('rejects bad definitions with schema', async () => {

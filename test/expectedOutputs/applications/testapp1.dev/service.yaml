@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{app}}
-  namespace: {{app}}
+  name: testapp1
+  namespace: testapp1
 spec:
   selector:
-    app: {{app}}
+    app: testapp1
   ports:
     - protocol: TCP
       port: 8000
-      targetPort: {{port}}
+      targetPort: 80

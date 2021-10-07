@@ -1,15 +1,14 @@
 kind: ApplicationDeployment
 metadata:
-  name: testapp1
+  name: testapp1.dev
 spec:
   repo: https://github.com/microsoft/multicloud-control-plane-transformer
   ref: main
-  path: test/applications/testapp1/app.yaml
+  path: test/applications/testapp1/app.dev.yaml
   clusters: all
   selector:
-    environment: prod
+    environment: dev
     geo: US
   values: 
     overrides:
-      replicas: 3
-        
+      memory: 2G

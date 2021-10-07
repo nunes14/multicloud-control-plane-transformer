@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testapp1-deployment
+  namespace: testapp1
+  labels:
+    app: testapp1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: testapp1
+  template:
+    metadata:
+      labels:
+        app: testapp1
+    spec:
+      containers:
+      - name: testapp1
+        image: nginx
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 1
+            memory: 2G

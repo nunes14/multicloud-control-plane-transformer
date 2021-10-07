@@ -1,0 +1,7 @@
+template: external-service
+values:
+  app: testapp1
+  image: nginx
+  memory: 256M
+  replicas: 2
+  port: 80

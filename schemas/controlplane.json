@@ -117,6 +117,27 @@
                   "string"
                 ]
               }
+            },
+            "values": {
+              "type": "object",
+              "description": "Template values to be set during deployment. Overrides template defaults and app values",
+              "additionalProperties": false,
+              "properties": {
+                "overrides": {
+                  "type": "object",
+                  "description": "Template values to be set during deployment. Overrides template defaults and app values",
+                  "additionalProperties": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  }
+                }
+              }
             }
           },
           "required": [
