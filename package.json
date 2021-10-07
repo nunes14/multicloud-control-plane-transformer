@@ -7,7 +7,7 @@
   "files": [
     "build/src",
     "build/schemas",
-    "build/templates"
+    "templates"
   ],
   "bin": {
     "transformer": "./bin/cli"
@@ -27,7 +27,7 @@
     "generate-types": "json2ts -i schemas/**/*.json > src/types.d.ts",
     "prepack": "npm run compile",
     "prepare": "npm run compile",
-    "postcompile": "copyfiles schemas templates/**/* build",
+    "postcompile": "copyfiles schemas build",
     "posttest": "npm run lint",
     "postgenerate-types": "npm run fix"
   },
