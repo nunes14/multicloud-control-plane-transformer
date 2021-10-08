@@ -1,6 +1,6 @@
 import {assignAll, AssignmentContext} from '../assignment';
 import {ControlPlaneClient} from '../controlPlaneClient';
-import {Logger} from "winston";
+import {Logger} from 'winston';
 
 export async function assignCommand(controlPlaneRepo: string, logger: Logger) {
   // gather the necessary data to make assignments
