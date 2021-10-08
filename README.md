@@ -2,7 +2,26 @@
 
 ## Usage
 
-The transformer CLI requires that you have created both a [Control Plane Repo](https://github.com/microsoft/multicloud-control-plane-seed) and a [Cluster GitOps Repo](https://github.com/microsoft/multicloud-control-plane-cluster-gitops-seed) from their respective templates.
+The transformer CLI is available as an image [on Docker Hub](https://hub.docker.com/repository/docker/multicloudcontrolplane/transformer): `multicloudcontrolplane/transformer`
+
+Usage requires that you have created both a [Control Plane Repo](https://github.com/microsoft/multicloud-control-plane-seed) and a [Cluster GitOps Repo](https://github.com/microsoft/multicloud-control-plane-cluster-gitops-seed) from their respective templates.
+
+> Transformer is under active development and does not yet have a stable release. Use `multicloudcontrolplane/transformer:main` to run the latest build
+
+### General usage
+
+```shell
+# Display the transformer help information
+docker run multicloudcontrolplane/transformer:main --help
+
+# Mount the repos and run the transformer
+docker run \
+  -v /path/to/control-plane:/controlplane \
+  -v /path/to/gitops:/gitops \
+  multicloudcontrolplane/transformer:main <command>
+```
+
+### Basic workflow
 
 ```shell
 # Clone your control plane and gitops repos
@@ -10,17 +29,27 @@ git clone <control-plane-repo> ./controlplane
 git clone <cluster-gitops-repo> ./gitops
 
 # Update assignments in the control plane
-transformer assign ./controlplane
+docker run --rm \
+  -v $(pwd)/controlplane:/controlplane \
+  multicloudcontrolplane/transformer:main assign /controlplane
+
+# Commit assignments back to the control plane
 pushd ./controlplane
 git commit -am "Updated application assignments"
 git push origin
 popd
 
 # Render application templates
-transformer render ./controlplane ./gitops
+docker run --rm \
+  -v $(pwd)/controlplane:/controlplane \
+  -v $(pwd)/gitops:/gitops \
+  multicloudcontrolplane/transformer:main render /controlplane /gitops
 
 # Apply clusters and assignments
-transformer apply ./controlplane ./gitops
+docker run --rm \
+  -v $(pwd)/controlplane:/controlplane \
+  -v $(pwd)/gitops:/gitops \
+  multicloudcontrolplane/transformer:main render /controlplane /gitops
 
 # Capture the latest control plane commit hash for use with the gitops repo
 SHA=$(cd ./controlplane && git rev-parse HEAD)
