@@ -24,10 +24,11 @@
     "compile": "tsc",
     "dev": "ts-node src/cli.main",
     "fix": "gts fix",
+    "generate-cli-docs": "ts-node scripts/generateCliDocs.ts",
     "generate-types": "json2ts -i schemas/**/*.json > src/types.d.ts",
     "prepack": "npm run compile",
     "prepare": "npm run compile",
-    "postcompile": "copyfiles 'templates/**/*' build",
+    "postcompile": "copyfiles 'templates/**/*' build && npm run generate-cli-docs",
     "posttest": "npm run lint",
     "postgenerate-types": "npm run fix"
   },

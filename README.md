@@ -1,5 +1,41 @@
 # Transformer
 
+## Usage
+
+The transformer CLI requires that you have created both a [Control Plane Repo](https://github.com/microsoft/multicloud-control-plane-seed) and a [Cluster GitOps Repo](https://github.com/microsoft/multicloud-control-plane-cluster-gitops-seed) from their respective templates.
+
+```shell
+# Clone your control plane and gitops repos
+git clone <control-plane-repo> ./controlplane
+git clone <cluster-gitops-repo> ./gitops
+
+# Update assignments in the control plane
+transformer assign ./controlplane
+pushd ./controlplane
+git commit -am "Updated application assignments"
+git push origin
+popd
+
+# Render application templates
+transformer render ./controlplane ./gitops
+
+# Apply clusters and assignments
+transformer apply ./controlplane ./gitops
+
+# Capture the latest control plane commit hash for use with the gitops repo
+SHA=$(cd ./controlplane && git rev-parse HEAD)
+
+# Commit and push. Cluster operations will be executed via Flux
+pushd ./gitops
+git commit -am "Update from commit ${SHA}"
+git push origin
+popd
+```
+
+## [Commands](docs/COMMANDS.md)
+
+A full list of commands can be found [here](docs/COMMANDS.md)
+
 ## Features
 
 ### Template Rendering
