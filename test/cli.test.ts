@@ -8,6 +8,7 @@ import simpleGit from 'simple-git';
 import {program} from '../src/cli';
 import {ControlPlaneClient} from '../src/controlPlaneClient';
 import {cloneWithSparseCheckout} from '../src/git';
+import {generateClusterGitopsRepo} from './util';
 
 describe('cli', () => {
   describe('assign', () => {
@@ -86,7 +87,7 @@ describe('cli', () => {
 
     it('can render a template', async () => {
       const tmpControlPlaneDir = await cloneControlPlaneRepo();
-      const tmpGitopsDir = await fs.mkdtemp(path.join(os.tmpdir(), '/'));
+      const tmpGitopsDir = await generateClusterGitopsRepo();
 
       await program.parseAsync(['render', tmpControlPlaneDir, tmpGitopsDir], {
         from: 'user',
@@ -97,6 +98,27 @@ describe('cli', () => {
         'applications',
         'testapp1.dev',
         'deployment.yaml'
+      );
+      const stats = await fs.stat(deploymentPath);
+      expect(stats.isFile()).to.equal(true);
+    });
+  });
+
+  describe('apply', () => {
+    it('can apply cluster information', async () => {
+      const tmpControlPlaneDir = await cloneControlPlaneRepo();
+      const tmpGitopsDir = await generateClusterGitopsRepo();
+
+      await program.parseAsync(['apply', tmpControlPlaneDir, tmpGitopsDir], {
+        from: 'user',
+      });
+
+      const deploymentPath = path.join(
+        tmpGitopsDir,
+        'clusters',
+        'cluster1',
+        'flux-system',
+        'kustomization.yaml'
       );
       const stats = await fs.stat(deploymentPath);
       expect(stats.isFile()).to.equal(true);
