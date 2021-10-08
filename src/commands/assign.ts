@@ -1,7 +1,10 @@
 import {assignAll, AssignmentContext} from '../assignment';
 import {ControlPlaneClient} from '../controlPlaneClient';
+import {Logger} from '../logger'
 
 export async function assignCommand(controlPlaneRepo: string) {
+  const logger = Logger;
+
   // gather the necessary data to make assignments
   const controlPlane = new ControlPlaneClient(controlPlaneRepo);
   const clusters = await controlPlane.getClusters();
@@ -17,27 +20,27 @@ export async function assignCommand(controlPlaneRepo: string) {
 
   // apply assignment operations to the control plane repo
   for (const o of operations) {
-    console.log(
+    logger.verbose(
       `operation: ${o.operation}; app: ${o.assignment.spec.application}; cluster: ${o.assignment.spec.cluster}`
     );
     if (o.operation === 'create') {
-      console.log(
+      logger.verbose(
         `Creating assignment ${o.assignment.spec.application}:${o.assignment.spec.cluster}`
       );
       await controlPlane.addAssignment(o.assignment);
     } else if (o.operation === 'delete') {
-      console.log(
+      logger.verbose(
         `Deleting assignment ${o.assignment.spec.application}:${o.assignment.spec.cluster}`
       );
       await controlPlane.deleteAssignment(o.assignment.metadata.name);
     } else {
-      console.log(
+      logger.verbose(
         `Skipping assignment ${o.assignment.spec.application}:${o.assignment.spec.cluster}`
       );
     }
   }
 
-  console.log(
+  logger.verbose(
     `Processed ${operations.length} assignments in ${controlPlaneRepo}`
   );
 }
