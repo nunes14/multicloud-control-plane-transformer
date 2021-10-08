@@ -16,11 +16,20 @@ import * as path from 'path';
 import Mustache = require('mustache');
 import {promises as fs} from 'fs';
 import {existsSync} from 'fs';
+import { ClusterGitOpsClient } from './clusterGitOpsClient';
 
 export class ApplicationTemplateNotFoundError extends Error {
   constructor(application: string, template: string) {
     super(
       `Cannot ApplicationTemplate ${template} for ApplicationDeployment ${application}`
+    );
+  }
+}
+
+export class ApplicationDeploymentDuplicateError extends Error {
+  constructor(appDeploymentName: string) {
+    super(
+      `There are multiple ApplicationDeployments with the name ${appDeploymentName}`
     );
   }
 }
@@ -38,6 +47,10 @@ export async function renderAll(
   templates: ApplicationTemplate[],
   outputPath: string
 ) {
+  // clear the output directory to ensure that the gitops repo doesn't keep any applications that have been removed
+  const gitops = new ClusterGitOpsClient(outputPath);
+  await gitops.resetDir(path.join(outputPath, 'applications'));
+
   const templateMap = new Map<string, ApplicationTemplate>(
     templates.map(t => [t.metadata.name, t])
   );
@@ -85,14 +98,14 @@ async function render(
   // build the values that will be used to populate the manifest templates
   const values = generateValues(template, app, deployment);
 
-  // clear the output directory to ensure that the application doesn't keep any files that have been removed
+  // check if there are application deployments with a duplicate name
   const outputDir = path.join(
     outputPath,
     'applications',
     deployment.metadata.name
   );
   if (existsSync(outputDir)) {
-    await fs.rm(outputDir, {recursive: true});
+    throw new ApplicationDeploymentDuplicateError(deployment.metadata.name);
   }
   await fs.mkdir(outputDir, {recursive: true});
 

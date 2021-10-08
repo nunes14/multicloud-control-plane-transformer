@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as process from 'process';
 
 import {
+  ApplicationDeploymentDuplicateError,
   ApplicationTemplateNotFoundError,
   generateValues,
   MissingParametersError,
@@ -106,7 +107,7 @@ describe('render', () => {
     );
   });
 
-  it('clears old files from the output directory', async () => {
+  it('clears old applications from the output directory', async () => {
     const deployments: ApplicationDeployment[] = [
       {
         kind: 'ApplicationDeployment',
@@ -143,7 +144,7 @@ describe('render', () => {
 
     const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), '/'));
 
-    const renderPath = path.join(tmpDir, 'applications', 'testapp1.dev');
+    const renderPath = path.join(tmpDir, 'applications', 'oldapplication');
     await fs.mkdir(renderPath, {recursive: true});
 
     const extraFilePath = path.join(renderPath, 'extra.txt');
@@ -152,6 +153,63 @@ describe('render', () => {
     await renderAll(deployments, templates, tmpDir);
 
     expect(existsSync(extraFilePath)).to.equal(false);
+  });
+
+  it('throws an error if an application deployment name is not unique', async () => {
+    const deployments: ApplicationDeployment[] = [
+      {
+        kind: 'ApplicationDeployment',
+        metadata: {
+          name: 'testapp1.dev',
+        },
+        spec: {
+          repo: process.cwd(),
+          ref: 'HEAD',
+          path: 'test/applications/testapp1/app.dev.yaml',
+          clusters: 1,
+          values: {
+            overrides: {
+              memory: '2G',
+            },
+          },
+        },
+      },
+      {
+        kind: 'ApplicationDeployment',
+        metadata: {
+          name: 'testapp1.dev',
+        },
+        spec: {
+          repo: process.cwd(),
+          ref: 'HEAD',
+          path: 'test/applications/testapp1/app.dev.yaml',
+          clusters: 1,
+          values: {
+            overrides: {
+              memory: '2G',
+            },
+          },
+        },
+      },
+    ];
+
+    const templates: ApplicationTemplate[] = [
+      {
+        kind: 'ApplicationTemplate',
+        metadata: {
+          name: 'external-service',
+        },
+        spec: {
+          repo: process.cwd(),
+          ref: 'HEAD',
+          path: 'test/templates/external-service/template.yaml',
+        },
+      },
+    ];
+
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), '/'));
+
+    await expect(renderAll(deployments, templates, tmpDir)).to.be.rejectedWith(ApplicationDeploymentDuplicateError);
   });
 
   describe('values', () => {
