@@ -16,7 +16,7 @@ import * as path from 'path';
 import Mustache = require('mustache');
 import {promises as fs} from 'fs';
 import {existsSync} from 'fs';
-import { ClusterGitOpsClient } from './clusterGitOpsClient';
+import {ClusterGitOpsClient} from './clusterGitOpsClient';
 
 export class ApplicationTemplateNotFoundError extends Error {
   constructor(application: string, template: string) {

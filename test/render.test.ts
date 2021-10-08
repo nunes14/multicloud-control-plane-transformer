@@ -209,7 +209,9 @@ describe('render', () => {
 
     const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), '/'));
 
-    await expect(renderAll(deployments, templates, tmpDir)).to.be.rejectedWith(ApplicationDeploymentDuplicateError);
+    await expect(renderAll(deployments, templates, tmpDir)).to.be.rejectedWith(
+      ApplicationDeploymentDuplicateError
+    );
   });
 
   describe('values', () => {
