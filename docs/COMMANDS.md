@@ -7,8 +7,7 @@ Options:
   -h, --help                                         display help for command
 
 Commands:
-  apply <control-plane-repo> <cluster-gitops-repo>   Update the cluster gitops repo from the current control plane
-                                                     configuration
+  apply <control-plane-repo> <cluster-gitops-repo>   Update the cluster gitops repo from the current control plane configuration
   assign <control-plane-repo>                        Generate assignments for applications to clusters
   render <control-plane-repo> <cluster-gitops-repo>  Render application templates to the cluster gitops repo
   help [command]                                     display help for command

@@ -1,3 +1,8 @@
+import {promises as fs} from 'fs';
+import * as fse from 'fs-extra';
+import * as os from 'os';
+import * as path from 'path';
+
 import {expect} from 'chai';
 import * as chai from 'chai';
 import chaiAsPromised = require('chai-as-promised');
@@ -33,5 +38,18 @@ describe('loader', () => {
         schema.$defs.Cluster // validate against a schema that won't pass
       )
     ).to.be.rejected;
+  });
+
+  it('skips hidden files', async () => {
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), '/'));
+    await fse.copy('./test/control-plane/assignments', tmpDir);
+    await fs.writeFile(path.join(tmpDir, '.gitkeep'), '', 'utf8');
+
+    const assignments = await loadAll<ApplicationAssignment>(
+      tmpDir,
+      schema.$defs.ApplicationAssignment
+    );
+    expect(assignments.length).to.be.greaterThan(0);
+    expect(assignments[0].metadata.name).to.equal('testapp1.dev-cluster1');
   });
 });

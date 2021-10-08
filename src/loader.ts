@@ -9,7 +9,7 @@ const ajv = new Ajv2020();
 export async function loadAll<T>(dir: string, schema?: Schema): Promise<T[]> {
   const items: T[] = [];
   for (const child of await fs.readdir(dir, {withFileTypes: true})) {
-    if (!child.isFile()) {
+    if (!child.isFile() || child.name.startsWith('.')) {
       continue;
     }
 
