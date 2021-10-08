@@ -1,10 +1,8 @@
 import {assignAll, AssignmentContext} from '../assignment';
 import {ControlPlaneClient} from '../controlPlaneClient';
-import {Logger} from '../logger'
+import {Logger} from "winston";
 
-export async function assignCommand(controlPlaneRepo: string) {
-  const logger = Logger;
-
+export async function assignCommand(controlPlaneRepo: string, logger: Logger) {
   // gather the necessary data to make assignments
   const controlPlane = new ControlPlaneClient(controlPlaneRepo);
   const clusters = await controlPlane.getClusters();

@@ -2,6 +2,7 @@ import {Command} from 'commander';
 import {applyCommand} from './commands/apply';
 import {assignCommand} from './commands/assign';
 import {renderCommand} from './commands/render';
+import {Logger} from './logger'
 
 export const program = new Command();
 
@@ -15,7 +16,7 @@ program
 program
   .command('assign <control-plane-repo>')
   .description('Generate assignments for applications to clusters')
-  .action(assignCommand);
+  .action((repo) => assignCommand(repo, Logger));
 
 program
   .command('render <control-plane-repo> <cluster-gitops-repo>')
