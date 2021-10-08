@@ -36,7 +36,30 @@ describe('ClusterGitOpsClient', () => {
   });
 
   describe('apply', () => {
-    it.skip('prunes cluster directories not present in the cluster list', async () => {});
+    it('prunes cluster directories for clusters that are not present in the cluster list', async () => {
+      const tmpDir = await generateClusterGitopsRepo();
+      const clusters: Cluster[] = [
+        {
+          kind: 'Cluster',
+          metadata: {
+            name: 'cluster1',
+          },
+          spec: {},
+        },
+      ];
+      const clustersDir = path.join(tmpDir, 'clusters');
+      const cluster1Dir = path.join(clustersDir, 'cluster1');
+      const cluster2Dir = path.join(clustersDir, 'cluster2');
+      await fs.mkdir(cluster1Dir, {recursive: true});
+      await fs.mkdir(cluster2Dir, {recursive: true});
+
+      const client = new ClusterGitOpsClient(tmpDir);
+      await client.apply(clusters, []);
+
+      expect(existsSync(cluster1Dir)).to.equal(true);
+      expect(existsSync(path.join(clustersDir, 'base'))).to.equal(true);
+      expect(existsSync(cluster2Dir)).to.equal(false);
+    });
 
     it('removes extra files present in the cluster directory', async () => {
       const tmpDir = await generateClusterGitopsRepo();

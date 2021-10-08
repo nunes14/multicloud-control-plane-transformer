@@ -5,6 +5,12 @@ import simpleGit from 'simple-git';
 
 export async function generateClusterGitopsRepo(): Promise<string> {
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), '/'));
+
+  const clustersDir = path.join(tmpDir, 'clusters');
+  await fs.mkdir(clustersDir, {recursive: true});
+  const clustersBaseDir = path.join(clustersDir, 'base');
+  await fs.mkdir(clustersBaseDir, {recursive: true});
+
   const git = simpleGit(tmpDir);
   await git.init();
   await git.addRemote(
