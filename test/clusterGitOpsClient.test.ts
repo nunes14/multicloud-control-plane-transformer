@@ -4,7 +4,11 @@ import * as path from 'path';
 import * as yaml from 'js-yaml';
 
 import {ApplicationAssignment, Cluster} from '../src';
-import {ClusterGitOpsClient, Kustomization} from '../src/clusterGitOpsClient';
+import {
+  ClusterGitOpsClient,
+  ResourcesKustomization,
+  Kustomization,
+} from '../src/clusterGitOpsClient';
 import simpleGit from 'simple-git';
 import {generateClusterGitopsRepo} from './util';
 
@@ -240,7 +244,7 @@ describe('ClusterGitOpsClient', () => {
       }
     });
 
-    it.skip('creates application files for a cluster with applications', async () => {
+    it('creates application files for a cluster with applications', async () => {
       const tmpDir = await generateClusterGitopsRepo();
       const clusters: Cluster[] = [
         {
@@ -272,15 +276,94 @@ describe('ClusterGitOpsClient', () => {
         'clusters',
         'cluster1',
         'flux-system',
-        'app-cluster1.yaml'
+        'assignment1.yaml'
       );
       const kustomizationText = await fs.readFile(expectedPath, 'utf8');
       const kustomization = yaml.load(kustomizationText) as Kustomization;
-      expect(kustomization.metadata.name).to.equal('application1');
+      expect(kustomization.metadata.name).to.equal('assignment1');
       expect(kustomization.spec?.path).to.equal('./applications/application1');
     });
 
-    it.skip('updates kustomization.yaml for a cluster with applications', async () => {
+    it('creates application files for multiple clusters with applications', async () => {
+      const tmpDir = await generateClusterGitopsRepo();
+      const clusters: Cluster[] = [
+        {
+          kind: 'Cluster',
+          metadata: {
+            name: 'cluster1',
+          },
+          spec: {},
+        },
+        {
+          kind: 'Cluster',
+          metadata: {
+            name: 'cluster2',
+          },
+          spec: {},
+        },
+      ];
+      const assignments: ApplicationAssignment[] = [
+        {
+          kind: 'ApplicationAssignment',
+          metadata: {
+            name: 'assignment1',
+          },
+          spec: {
+            cluster: 'cluster1',
+            application: 'application1',
+          },
+        },
+        {
+          kind: 'ApplicationAssignment',
+          metadata: {
+            name: 'assignment2',
+          },
+          spec: {
+            cluster: 'cluster1',
+            application: 'application2',
+          },
+        },
+        {
+          kind: 'ApplicationAssignment',
+          metadata: {
+            name: 'assignment3',
+          },
+          spec: {
+            cluster: 'cluster2',
+            application: 'application1',
+          },
+        },
+      ];
+
+      const client = new ClusterGitOpsClient(tmpDir);
+      await client.apply(clusters, assignments);
+
+      const expectedPath = path.join(
+        tmpDir,
+        'clusters',
+        'cluster1',
+        'flux-system',
+        'assignment1.yaml'
+      );
+      const kustomizationText = await fs.readFile(expectedPath, 'utf8');
+      const kustomization = yaml.load(kustomizationText) as Kustomization;
+      expect(kustomization.metadata.name).to.equal('assignment1');
+      expect(kustomization.spec?.path).to.equal('./applications/application1');
+
+      const expectedPath2 = path.join(
+        tmpDir,
+        'clusters',
+        'cluster2',
+        'flux-system',
+        'assignment3.yaml'
+      );
+      const kustomizationText2 = await fs.readFile(expectedPath2, 'utf8');
+      const kustomization2 = yaml.load(kustomizationText2) as Kustomization;
+      expect(kustomization2.metadata.name).to.equal('assignment3');
+      expect(kustomization2.spec?.path).to.equal('./applications/application1');
+    });
+
+    it('updates kustomization.yaml for a cluster with applications', async () => {
       const tmpDir = await generateClusterGitopsRepo();
       const clusters: Cluster[] = [
         {
@@ -315,8 +398,10 @@ describe('ClusterGitOpsClient', () => {
         'kustomization.yaml'
       );
       const kustomizationText = await fs.readFile(expectedPath, 'utf8');
-      const kustomization = yaml.load(kustomizationText) as Kustomization;
-      expect(kustomization.resources).to.include('app-cluster1.yaml');
+      const kustomization = yaml.load(
+        kustomizationText
+      ) as ResourcesKustomization;
+      expect(kustomization.resources).to.include('assignment1.yaml');
     });
   });
 });

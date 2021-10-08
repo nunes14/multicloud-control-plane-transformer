@@ -2,23 +2,31 @@
 
 ## Features
 
-### Rendering
+### Template Rendering
 
-The `render` command populates the placeholders in a template with values in the following order:
+The `render` command populates the placeholders in a template and writes them to the Cluster GitOps Repo. The values are filled in the following order:
 
 - Template parameter default values (lowest priority)
 - Application values
 - Application deployment overrides (highest priority)
 
-### Assignment
+### Application Assignment
 
-The `assign` command reads the contents of a Control Plane Repo and ensures that applications are assigned to the correct clusters.
+The `assign` command reads the contents of a Control Plane Repo and ensures that applications are assigned to the correct clusters. The assignments are written back to the Control Plane Repo.
 
 - Evaluates clusters against the criteria specified by an application
 - Removes assignments for clusters that don't match the criteria
 - Removes assignments if there are currently more than the number specified
 - Keeps existing assignments to ensure an application doesn't incur unnecessary downtime
 - Adds new assignments if there are currently fewer than the number specified
+
+### Applying changes
+
+The `apply` command updates a Cluster GitOps Repo based on the clusters and assignments contained in a Control Plane Repo.
+
+- Removes cluster directories that are no longer present
+- Creates cluster directories for newly registered clusters
+- Adds/removes application entries that have been assigned to a given cluster
 
 ## Contributing
 

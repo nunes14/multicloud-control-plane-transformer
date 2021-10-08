@@ -1,6 +1,7 @@
 import {existsSync, promises as fs} from 'fs';
 import path = require('path');
 import Mustache = require('mustache');
+import * as yaml from 'js-yaml';
 
 import {ApplicationAssignment, Cluster} from '.';
 import simpleGit from 'simple-git';
@@ -8,18 +9,30 @@ import simpleGit from 'simple-git';
 // We need to render special characters for repo urls, so we disable escaping
 Mustache.escape = text => text;
 
+export interface ResourcesKustomization {
+  apiVersion: string;
+  kind: 'Kustomization';
+  resources: string[];
+}
+
 export interface Kustomization {
   apiVersion: string;
   kind: 'Kustomization';
   metadata: {
     name: string;
+    namespace?: string;
     annotations?: {
       [k: string]: string;
     };
   };
-  resources?: string[];
-  spec?: {
+  spec: {
+    interval: string;
+    sourceRef: {
+      kind: string;
+      name: string;
+    };
     path: string;
+    prune: boolean;
   };
 }
 
@@ -35,15 +48,26 @@ export class ClusterGitOpsClient {
   async apply(clusters: Cluster[], assignments: ApplicationAssignment[]) {
     // prune clusters not present in the cluster list
 
+    // populate files per cluster
+    const assignmentsMap = this.getClusterAssignmentsMap(assignments);
     for (const cluster of clusters) {
       const clusterDir = path.join(
         this.localPath,
         'clusters',
         cluster.metadata.name
       );
+
+      // reset the folder and start from scratch every time to ensure old files are removed
       await this.resetDir(clusterDir);
+
+      // add the base files that every cluster gets
       await this.populateClusterDir(clusterDir, cluster);
-      await this.populateClusterApplications(clusterDir, assignments);
+
+      // add application assignment files
+      const clusterAssignments = assignmentsMap.get(cluster.metadata.name);
+      if (clusterAssignments) {
+        await this.populateClusterApplications(clusterDir, clusterAssignments);
+      }
     }
   }
 
@@ -62,7 +86,8 @@ export class ClusterGitOpsClient {
     const fluxSystemDir = path.join(clusterDir, 'flux-system');
     await fs.mkdir(fluxSystemDir, {recursive: true});
 
-    const templateDir = path.join('templates/cluster');
+    const packageDir = require.resolve('.');
+    const templateDir = path.join(packageDir, '../../templates/cluster');
     for (const file of await fs.readdir(templateDir)) {
       const template = await fs.readFile(path.join(templateDir, file), 'utf8');
 
@@ -90,11 +115,71 @@ export class ClusterGitOpsClient {
   }
 
   async populateClusterApplications(
-    path: string,
+    clusterDir: string,
     assignments: ApplicationAssignment[]
   ): Promise<void> {
-    // for each application assigned to the cluster
-    // add a file that points to the correct location in /applications
-    // update kustomization.yaml to include the above file
+    const fluxSystemDir = path.join(clusterDir, 'flux-system');
+    await this.createAssignmentKustomizations(fluxSystemDir, assignments);
+
+    const kustomizationPath = path.join(fluxSystemDir, 'kustomization.yaml');
+    await this.addAssignmentsToClusterKustomization(
+      kustomizationPath,
+      assignments
+    );
+  }
+
+  async createAssignmentKustomizations(
+    outputDir: string,
+    assignments: ApplicationAssignment[]
+  ) {
+    for (const assignment of assignments) {
+      const kustomization: Kustomization = {
+        apiVersion: 'kustomize.toolkit.fluxcd.io/v1beta1',
+        kind: 'Kustomization',
+        metadata: {
+          name: assignment.metadata.name,
+          namespace: 'flux-system',
+        },
+        spec: {
+          interval: '1m0s',
+          sourceRef: {
+            kind: 'GitRepository',
+            name: 'flux-system',
+          },
+          path: `./applications/${assignment.spec.application}`,
+          prune: true,
+        },
+      };
+      const kustomizationPath = path.join(
+        outputDir,
+        `${assignment.metadata.name}.yaml`
+      );
+      await fs.writeFile(kustomizationPath, yaml.dump(kustomization), 'utf8');
+    }
+  }
+
+  getClusterAssignmentsMap(assignments: ApplicationAssignment[]) {
+    const map = new Map<string, ApplicationAssignment[]>();
+    for (const assignment of assignments) {
+      if (!map.has(assignment.spec.cluster)) {
+        map.set(assignment.spec.cluster, []);
+      }
+      map.get(assignment.spec.cluster)!.push(assignment);
+    }
+    return map;
+  }
+
+  async addAssignmentsToClusterKustomization(
+    kustomizationPath: string,
+    assignments: ApplicationAssignment[]
+  ) {
+    const kustomizationText = await fs.readFile(kustomizationPath, 'utf8');
+    const kustomization = yaml.load(
+      kustomizationText
+    ) as ResourcesKustomization;
+    kustomization.resources!.push(
+      ...assignments.map(a => `${a.metadata.name}.yaml`)
+    );
+    await fs.writeFile(kustomizationPath, yaml.dump(kustomization), 'utf8');
   }
 }
