@@ -46,7 +46,8 @@ export class ClusterGitOpsClient {
 
   /** overwrite contents of the cluster gitops repo to match the specified clusters and assignments */
   async apply(clusters: Cluster[], assignments: ApplicationAssignment[]) {
-    // prune clusters not present in the cluster list
+    // prune cluster directories for clusters not present in the cluster list
+    await this.pruneObsoleteClusterDirs(clusters);
 
     // populate files per cluster
     const assignmentsMap = this.getClusterAssignmentsMap(assignments);
@@ -67,6 +68,23 @@ export class ClusterGitOpsClient {
       const clusterAssignments = assignmentsMap.get(cluster.metadata.name);
       if (clusterAssignments) {
         await this.populateClusterApplications(clusterDir, clusterAssignments);
+      }
+    }
+  }
+
+  /** check content of the cluster gitops repo for obsolete cluster folders and prune ones */
+  async pruneObsoleteClusterDirs(clusters: Cluster[]) {
+    const clusterSet = new Set<string>(clusters.map(c => c.metadata.name));
+    const clustersDir = path.join(this.localPath, 'clusters');
+    const existingDirs = await fs.readdir(clustersDir);
+    for (const dir of existingDirs) {
+      const stats = await fs.stat(path.join(clustersDir, dir));
+      if (
+        stats.isDirectory() === true &&
+        !clusterSet.has(dir) &&
+        dir !== 'base'
+      ) {
+        await fs.rm(path.join(clustersDir, dir), {recursive: true});
       }
     }
   }
