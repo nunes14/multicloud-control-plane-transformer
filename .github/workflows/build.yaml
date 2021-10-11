@@ -1,5 +1,8 @@
 on: [push, pull_request]
 
+env:
+  ARTIFACT_PATH: ${{ env.RUNNER_TEMP }}/artifacts
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -9,10 +12,10 @@ jobs:
     - run: npm install --ignore-scripts
     - run: npm test
     - run: |
-        mkdir /artifacts
-        npm pack . --pack-destination /artifacts
+        mkdir -p ${{ env.ARTIFACT_PATH }}
+        npm pack . --pack-destination ${{ env.ARTIFACT_PATH }}
     
     - uses: actions/upload-artifact@v2
       with:
         name: artifacts
-        path: /artifacts/*.tar.gz
+        path: ${{ env.ARTIFACT_PATH }}/*.tar.gz
