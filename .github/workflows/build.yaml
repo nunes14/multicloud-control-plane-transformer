@@ -8,14 +8,17 @@ jobs:
 
     - run: npm install --ignore-scripts
     - run: npm test
-    - id: pack
-      run: |
-        ARTIFACT_PATH=$(mktemp -d)
-        echo "::set-output name=ARTIFACT_PATH::$(echo $ARTIFACT_PATH)"
-
-        npm pack . --pack-destination $ARTIFACT_PATH
-    
+    - run: npm pack .
     - uses: actions/upload-artifact@v2
       with:
-        name: artifacts
-        path: ${{ steps.pack.outputs.ARTIFACT_PATH }}/*.tar.gz
+        name: npm-package
+        path: multicloud-control-plane-transformer-*.tar.gz
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: npm-package
+    - run: ls -R
