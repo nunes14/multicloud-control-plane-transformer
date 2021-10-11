@@ -22,10 +22,6 @@ jobs:
     - name: Run tests
       run: npm test
 
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
     - name: Publish to npm
       uses: JS-DevTools/npm-publish@v1
       with:
