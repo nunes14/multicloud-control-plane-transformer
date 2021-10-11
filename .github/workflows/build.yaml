@@ -22,7 +22,16 @@ jobs:
     - name: Run tests
       run: npm test
 
-    - name: Publish to npm
-      uses: JS-DevTools/npm-publish@v1
+    - name: Create npm package
+      run: |
+        npm --version
+        npm pack --help
+        
+        mkdir artifacts
+        npm pack . --pack-destination artifacts
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
       with:
-        token: ${{ secrets.NPM_TOKEN }}
+        name: artifacts
+        path: artifacts/**/*

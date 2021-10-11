@@ -1,0 +1,19 @@
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download build artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        workflow: build.yaml
+        workflow_conclusion: success
+        commit: ${{ github.event.sha }}
+        name: artifacts
+
+    - run: |
+        ls -R
