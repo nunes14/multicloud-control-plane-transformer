@@ -4,32 +4,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Setup Node
+      uses: actions/setup-node@v2
       with:
         node-version: '14'
         cache: 'npm'
-    - run: npm i -g npm
 
-    - run: npm install --ignore-scripts
-    - run: npm test
-    - run: |
-        npm --version
-        npm pack --help
-        
-        mkdir artifacts
-        npm pack . --pack-destination artifacts
+    - name: Install dependencies
+      run: npm install --ignore-scripts
 
-    - uses: actions/upload-artifact@v2
+    - name: Run tests
+      run: npm test
+
+    - name: Publish to npm
+      uses: JS-DevTools/npm-publish@v1
       with:
-        name: artifacts
-        path: artifacts/**/*
-
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/download-artifact@v2
-      with:
-        name: artifacts
-    - run: ls -R
+        token: ${{ secrets.NPM_TOKEN }}
