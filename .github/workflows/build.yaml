@@ -8,12 +8,16 @@ jobs:
     - uses: actions/setup-node@v2
       with:
         node-version: '14'
+        cache: 'npm'
     - run: npm i -g npm
-    - run: npm --version
 
     - run: npm install --ignore-scripts
     - run: npm test
-    - run: mkdir artifacts
+    - run: |
+        npm --version
+        npm pack --help
+        
+        mkdir artifacts
         npm pack . --pack-destination artifacts
 
     - uses: actions/upload-artifact@v2
