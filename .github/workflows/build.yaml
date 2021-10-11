@@ -24,9 +24,6 @@ jobs:
 
     - name: Create npm package
       run: |
-        npm --version
-        npm pack --help
-        
         mkdir artifacts
         npm pack . --pack-destination artifacts
 
